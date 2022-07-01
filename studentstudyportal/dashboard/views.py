@@ -2,8 +2,9 @@ from cgitb import text
 from email import message
 from multiprocessing import context
 from unittest import result
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from youtubesearchpython import VideosSearch
+from django.contrib import messages
 
 from dashboard.forms import DashboardSearch, UserRegistrationForm
 
@@ -12,16 +13,19 @@ from dashboard.forms import DashboardSearch, UserRegistrationForm
 def home(request):
     return render(request,'dashboard/home.html')
 
-def login(request):
-    return render(request,'dashboard/login.html')
+#creating for login
+#def login(request):
+#    return render(request,'dashboard/login.html')
 
+#creating for register
 def register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
             form.save()
-            username = form.cleaned_data.get('username')
-            message.success(request,f"Account created for {username}!! ")
+            user = form.cleaned_data.get('username')
+            messages.success(request,f"Account created for {user}!! ")
+            return redirect('login')
     else:
         form = UserRegistrationForm()
     context = {

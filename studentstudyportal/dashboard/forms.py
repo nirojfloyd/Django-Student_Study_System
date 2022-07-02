@@ -10,6 +10,13 @@ from django.contrib.auth.forms import UserCreationForm
 class DashboardSearch(forms.Form):
     text = forms.CharField(max_length=100,label="Enter your text") 
 
+
+class NotesForm(forms.ModelForm):
+    class Meta:
+        model = Notes
+        fields = ['title','desc']
+
+
 #for user registeration
 class UserRegistrationForm(UserCreationForm):
    class Meta:

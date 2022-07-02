@@ -1,10 +1,15 @@
 from cgitb import text
+from django.shortcuts import redirect, render
+from . forms import *
+from django.views import generic
 from email import message
 from multiprocessing import context
 from unittest import result
 from django.shortcuts import render, redirect
 from youtubesearchpython import VideosSearch
 from django.contrib import messages
+import requests
+from django.contrib.auth.decorators import login_required
 
 from dashboard.forms import DashboardSearch, UserRegistrationForm
 
@@ -32,7 +37,8 @@ def register(request):
     'form':form
     }
     return render(request,"dashboard/register.html",context)
-    
+
+@login_required    
 def youtube(request):
     if request.method == "POST":
         form =DashboardSearch(request.POST)
@@ -49,6 +55,30 @@ def youtube(request):
         form = DashboardSearch()
     context = {'form':form}
     return render(request,'dashboard/youtube.html',context)
+
+
+
+def notes(request):
+    if request.method == 'POST':
+        form = NotesForm(request.POST)
+        if form.is_valid():
+            notes = Notes(user=request.user,title=request.POST['title'],desc=request.POST['desc'])
+            notes.save()
+        messages.success(request,f"Notes Save By {request.user.username} Successfully")
+    else:
+        form = NotesForm()
+    notes = Notes.objects.filter(user=request.user)
+    context = {'notes':notes,'form':form}
+    return render(request,'dashboard/notes.html',context)
+
+@login_required
+def delete_note(request,pk=None):
+    Notes.objects.get(id=pk).delete()
+    return redirect("notes")
+
+
+class NotesDetailView(generic.DetailView):
+    model = Notes
 
 
 

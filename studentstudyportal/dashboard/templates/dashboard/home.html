@@ -1,9 +1,15 @@
 {% extends 'dashboard/base.html' %} 
 {% load static %} 
 {% block content %}
+<style>
+  .hello-msg{
+    font-size: 18px;
+    color: black;
+    
+  }
+</style>
 <section class="container text-center">
-  <h3>Welcome</h3>
-
+  <h3>Welcome, {{request.user}}</h3>
   <hr> <br>
   <div class="row">
     <div class="col-md-3">

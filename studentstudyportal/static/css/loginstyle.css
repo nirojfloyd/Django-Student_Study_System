@@ -32,6 +32,13 @@ h1,h2,h3,h4,h5,h6 {
 	margin-top: 0;
 }
 
+p1{
+	font-size:medium;
+	background-color: rgb(133, 124, 168);
+	text-align: center;
+	
+}
+
 
 input, input:focus,
 button, button:focus {
@@ -92,6 +99,7 @@ input[type=password] {
     max-width: 800px;
     min-height: 500px;
     width: 100%;
+	padding-top: 0px;
 }
 .login-wrapper .loginbox .login-left {
     align-items: center;
@@ -129,13 +137,7 @@ input[type=password] {
     margin-bottom: 1.875rem;
     text-align: center;
 }
-.login-wrapper .loginbox .login-right .forgotpass a {
-	color: #a0a0a0;
-}
-.login-wrapper .loginbox .login-right .forgotpass a:hover {
-	color: #333;
-	text-decoration: underline;
-}
+
 .login-wrapper .loginbox .login-right .dont-have {
 	color: #a0a0a0;
 	margin-top: 1.875rem;
@@ -145,21 +147,6 @@ input[type=password] {
 }
 .login-wrapper .loginbox .login-right .dont-have a:hover {
 	text-decoration: underline;
-}
-
-
-
-.social-login > a {
-	background-color: #ccc;
-	border-radius: 4px;
-	color: #fff;
-	display: inline-block;
-	font-size: 18px;
-	height: 32px;
-	line-height: 32px;
-	margin-right: 6px;
-	text-align: center;
-	width: 32px;
 }
 
 .login-or {

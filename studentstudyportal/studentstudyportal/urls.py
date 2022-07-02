@@ -27,7 +27,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('',include('dashboard.urls')),
     path('register/',dash_views.register,name='register'),
-    path('login/',auth_views.LoginView.as_view(template_name ="dashboard/login.html"),name='register')
+    path('login/',auth_views.LoginView.as_view(template_name ="dashboard/login.html"),name='login')
 
     
     

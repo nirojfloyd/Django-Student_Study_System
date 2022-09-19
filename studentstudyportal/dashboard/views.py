@@ -15,6 +15,7 @@ from dashboard.forms import UserRegistrationForm
 
 
 #creating views here
+@login_required
 def home(request):
     return render(request,'dashboard/home.html')
 

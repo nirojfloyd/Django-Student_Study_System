@@ -7,8 +7,8 @@ from django.contrib.auth.forms import UserCreationForm
 
 
 
-class DashboardSearch(forms.Form):
-    text = forms.CharField(max_length=100,label="Enter your text") 
+class DashboardForm(forms.Form):
+    text = forms.CharField(max_length=100,label="Enter Your Search : ")
 
 
 class NotesForm(forms.ModelForm):
@@ -22,3 +22,17 @@ class UserRegistrationForm(UserCreationForm):
    class Meta:
     model = User
     fields = ['username','email','password1','password2']
+
+class DateInput(forms.DateInput):
+    input_type = 'date'
+
+class HomeworkForm(forms.ModelForm):
+    class Meta:
+        model = Homework
+        widgets = {'due':DateInput()}
+        fields = ['subject','title','description','due','is_finished']
+
+class TodoForm(forms.ModelForm):
+    class Meta:
+        model = Todo
+        fields = ['title','is_finished']

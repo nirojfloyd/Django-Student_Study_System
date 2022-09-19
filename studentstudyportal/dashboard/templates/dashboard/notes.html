@@ -3,11 +3,12 @@
 {% load crispy_forms_tags %}
 {% block content %}
 
+
 <div class="container">
     <div class="row">
         {% for note in notes %}
         <div class="col-md-3">
-            <a href="{% url 'notedetail' note.id %}">
+            <a href="{% url 'notes-detail' note.id %}">
                 <div class="card">
                     <div class="card-header">{{note.title}}</div>
                     <div class="card-body">{{note.desc|slice:"0:100"}}</div>

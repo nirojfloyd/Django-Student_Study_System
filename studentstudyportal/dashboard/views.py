@@ -1,4 +1,5 @@
 from cgitb import text
+from time import time
 from django.shortcuts import redirect, render
 from . forms import *
 from django.views import generic
@@ -10,7 +11,8 @@ from youtubesearchpython import VideosSearch
 from django.contrib import messages
 import requests
 from django.contrib.auth.decorators import login_required
-
+import wikipedia
+import dictionary
 from dashboard.forms import UserRegistrationForm
 
 
@@ -39,7 +41,7 @@ def register(request):
     }
     return render(request,"dashboard/register.html",context)
 
-@login_required    
+   
 def youtube(request):
     if request.method == 'POST':
         form = DashboardForm(request.POST)
@@ -74,7 +76,7 @@ def youtube(request):
     return render(request,'dashboard/youtube.html',context)
 
 
-
+@login_required
 def notes(request):
     if request.method == 'POST':
         form = NotesForm(request.POST)
@@ -202,4 +204,169 @@ def delete_todo(request,pk=None):
 
 
 
-    
+def books(request):
+    if request.method == 'POST':
+        form = DashboardForm(request.POST)
+        text = request.POST['text']
+        url = "https://www.googleapis.com/books/v1/volumes?q="+text
+        #print(url)
+        r = requests.get(url)
+        answer = r.json()
+        result_list = []
+        for i in range(10):
+            result_dict = {
+                'title':answer['items'][i]['volumeInfo']['title'],
+                'subtitle':answer['items'][i]['volumeInfo'].get('subtitle'),
+                'description':answer['items'][i]['volumeInfo'].get('description'),
+                'count':answer['items'][i]['volumeInfo'].get('pageCount'),
+                'categories':answer['items'][i]['volumeInfo'].get('categories'),
+                'rating':answer['items'][i]['volumeInfo'].get('pageRating'),
+                'thumbnail':answer['items'][i]['volumeInfo'].get('imageLinks').get('thumbnail'),
+                'preview':answer['items'][i]['volumeInfo'].get('previewLink')
+            }
+            result_list.append(result_dict)
+            #print(result_list)
+            context = {
+                'form':form,
+                'results':result_list
+            }
+        return render(request,'dashboard/books.html',context)
+    else:
+        form = DashboardForm()
+    context = {'form':form}
+    return render(request,'dashboard/books.html',context)
+
+
+def dictionary(request):
+    if request.method == 'POST':
+        form = DashboardForm(request.POST)
+        text = request.POST['text']
+        url = "https://api.dictionaryapi.dev/api/v2/entries/en/"+text
+        r = requests.get(url)
+        answer = r.json()
+        try:
+            phonetics = answer[0]['phonetics'][0]['text']
+            audio = answer[0]['phonetics'][0]['audio']
+            definition = answer[0]['meanings'][0]['definitions'][0]['definition']
+            example = answer[0]['meanings'][0]['definitions'][0]['example']
+            synonyms = answer[0]['meanings'][0]['definitions'][0]['synonyms']
+            context = {
+                'form':form,
+                'input':text,
+                'phonetics':phonetics,
+                'audio':audio,
+                'definition':definition,
+                'example':example,
+                'synonyms':synonyms
+            }
+        except:
+            context = {
+                'form':form,
+                'input':''
+            }
+        return render(request,'dashboard/dictionary.html',context)
+    else:
+        form = DashboardForm()
+        context = {'form':form}
+    return render(request,'dashboard/dictionary.html',context) 
+
+
+def wiki(request):
+    if request.method == 'POST':
+        text = request.POST['text']
+        form = DashboardForm(request.POST)
+        search = wikipedia.page(text)
+        context = {
+            'form':form,
+            'title':search.title,
+            'link':search.url,
+            'details':search.summary
+        }
+        return render(request,'dashboard/wiki.html',context)
+    else:
+        form = DashboardForm()
+        context = {
+            'form':form
+        }
+    return render(request,'dashboard/wiki.html',context)
+
+
+
+def conversion(request):
+    if request.method == 'POST':
+        form = ConversionForm(request.POST)
+        if request.POST['measurement'] == 'length':
+            measurement_form = ConversionLengthForm()
+            context = {
+                'form':form,
+                'm_form':measurement_form,
+                'input':True
+            }
+            if 'input' in request.POST:
+                first = request.POST['measure1']
+                second = request.POST['measure2']
+                input = request.POST['input']
+                answer = ''
+                if input and int(input) >= 0:
+                    if first == 'yard' and second == 'foot':
+                        answer = f'{input} yard = {int(input)*3} foot'
+                    if first == 'foot' and second == 'yard':
+                        answer = f'{input} foot = {int(input)/3} yard'
+                    context = {
+                        'form':form,
+                        'm_form':measurement_form,
+                        'input':True,
+                        'answer':answer
+                    }
+        if request.POST['measurement'] == 'mass':
+            measurement_form = ConversionMassForm()
+            context = {
+                'form':form,
+                'm_form':measurement_form,
+                'input':True
+            }
+            if 'input' in request.POST:
+                first = request.POST['measure1']
+                second = request.POST['measure2']
+                input = request.POST['input']
+                answer = ''
+                if input and int(input) >= 0:
+                    if first == 'pound' and second == 'kilogram':
+                        answer = f'{input} Pound = {int(input)*0.453592} Kilogram'
+                    if first == 'kilogram' and second == 'pound':
+                        answer = f'{input} Kilogram = {int(input)*2.20462} Pound'
+                    context = {
+                        'form':form,
+                        'm_form':measurement_form,
+                        'input':True,
+                        'answer':answer
+                    }
+
+    else:
+        form = ConversionForm()
+        context = {
+            'form':form,
+            'input':False
+        }
+    return render(request,'dashboard/conversion.html',context) 
+
+
+@login_required
+def profile(request):
+    homeworks = Homework.objects.filter(is_finished=False,user=request.user)
+    todos = Todo.objects.filter(is_finished=False,user=request.user)
+    if len(homeworks) == 0:
+        homework_done = True
+    else:
+        homework_done = False
+    if len(todos) == 0:
+        todos_done = True
+    else:
+        todos_done = False
+    context = {
+        'homeworks' : homeworks,
+        'todos'     : todos,
+        'homework_done':homework_done,
+        'todos_done' : todos_done
+    }
+    return render(request,'dashboard/profile.html',context)
